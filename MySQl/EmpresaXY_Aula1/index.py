@@ -7,9 +7,9 @@ from admin import menu_admin
 #String de conexão
 conexao = mysql.connector.connect(
     host = "localhost",
-    user = "root",
-    password = "2079",
-    database = "EmpresaXY"
+    user = "Seu user",
+    password = "Sua senha",
+    database = "Seu DB"
 )
 
 #Cursor de conexão
