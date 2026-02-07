@@ -1,15 +1,17 @@
 #Todas as libs usadas
 import mysql.connector
 import bcrypt
+from dotenv import load_dotenv
 import os
 from admin import menu_admin
 
+load_dotenv()
 #String de conexão
 conexao = mysql.connector.connect(
-    host = "localhost",
-    user = "Seu user",
-    password = "Sua senha",
-    database = "Seu DB"
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
 )
 
 #Cursor de conexão
@@ -19,17 +21,23 @@ cursor = conexao.cursor()
 nome = "Admin"
 senha = "Admin123"
 email = "Admin@Email.com"
-tipo = "Admin"
+tipo = "Admin"  
 
 
 #Gerar hash de senha formato 256
 hash_senha = bcrypt.hashpw(senha.encode(), bcrypt.gensalt()).decode()
 
-#Atribuir valores Ao BD
-sql = "INSERT INTO Usuarios (Nome, Senha, Email, Tipo) VALUES (%s, %s, %s, %s ) ON DUPLICATE KEY UPDATE Email = Email;"    
-valores = (nome , hash_senha, email, tipo)
-cursor.execute(sql, valores)
-conexao.commit() 
+
+sql = "SELECT Id FROM Usuarios WHERE Email = %s"
+cursor.execute(sql, (email,))
+existe = cursor.fetchone()
+
+#Atribuir valores Ao BD + checar se existe
+if existe is None:
+    sql = "INSERT INTO Usuarios (Nome, Senha, Email, Tipo) VALUES (%s, %s, %s, %s)"
+    valores = (nome, hash_senha, email, tipo)
+    cursor.execute(sql, valores)
+    conexao.commit()
 
 while True:
     
